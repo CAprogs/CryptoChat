@@ -8,7 +8,8 @@
 
 
 import os
-from Server.server import Server, file_path
+from Server.server import Server
+#from Server.User import file_path
 from Server.Database import DB
 
 
@@ -24,8 +25,8 @@ if __name__ == '__main__':
         server = Server(SERVER_NAME, HOST, PORT)
 
         # verify if the server has already generated a pair of keys
-        private_key_file = file_path("keys", server.username + "_private_key.pem")
-        public_key_file = file_path("keys", server.username + "_public_key.pem")
+        private_key_file = server.username + "_private_key.pem" # file_path("keys", server.username + "_private_key.pem")
+        public_key_file = server.username + "_public_key.pem" # file_path("keys", server.username + "_public_key.pem")
         if os.path.exists(private_key_file) and os.path.exists(public_key_file):
             with open(private_key_file, 'rb') as file:
                 server.private_key = file.read()
@@ -39,6 +40,8 @@ if __name__ == '__main__':
     
     except KeyboardInterrupt:
         print("\nServer shutdown..")
-        if server.socket is not None:
+        try:
             server.socket.close()
+        except:
+            pass
         DB.conn.close()

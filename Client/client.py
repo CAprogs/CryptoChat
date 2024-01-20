@@ -1,4 +1,4 @@
-from User import User, send_message
+from .User import User, send_message
 
 
 class Client(User):
@@ -20,11 +20,12 @@ class Client(User):
                     self.server_pub_key.append(message.replace("SERVER_PUBLIC_KEY ", ""))
                     self.send_encrypted_message(self.socket, f"{self.username} {self.public_key} {self.host} {self.public_ip} {self.mac} {self.city} {self.region} {self.location}", self.server_pub_key[0])
                 else:
-                    message = self.decrypt(message, self.private_key)
+                    message = self.decrypt(message)
                     print(message)
             except Exception as e:
                 print(e)
-                self.socket.close()
+                if self.socket is not None:
+                    self.socket.close()
                 break
     
     def write_message(self):

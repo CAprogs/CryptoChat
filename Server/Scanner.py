@@ -1,5 +1,5 @@
 import nmap
-#import scapy.all as scapy
+import scapy.all as scapy
 
 class MyScanner:
     def __init__(self, target_ip):
@@ -24,3 +24,21 @@ class MyScanner:
         except Exception as e:
             print(f"Error : {e}")
             return None
+
+    '''
+    def mac_scan(self):
+        try:
+            # Use Scapy to send an ARP request and collect the response
+            arp_request = scapy.ARP(pdst=self.target_ip)
+            broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
+            arp_request_broadcast = broadcast/arp_request
+            answered_list = scapy.srp(arp_request_broadcast, timeout=1, verbose=False)[0]
+
+            # Extract the MAC address from the response
+            mac_address = answered_list[0][1].hwsrc
+
+            return mac_address
+        except Exception as e:
+            print(f"Error : {e}")
+            return None
+    '''

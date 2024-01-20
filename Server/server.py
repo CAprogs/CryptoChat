@@ -2,7 +2,7 @@
 import socket
 import threading
 from Crypto.Signature import pkcs1_15
-from User import User, send_message, get_timestamp
+from .User import User, send_message, get_timestamp
 
 
 class Server(User):
@@ -74,9 +74,10 @@ class Server(User):
                         send_message("Waiting for a second client ..", client)
                         continue
                     for user in users_copy.values():
-                        receiver = user.get("username")
+                        receiver = user.get("username", "UnknownUser")
                     timestamp = get_timestamp()
-                    encrypted_message, hash256, signature = self.broadcast(f"{self.users[client].get("username")}: {message}")
+                    username = self.users.get(client, {}).get("username", "UnknownUser")
+                    encrypted_message, hash256, signature = self.broadcast(f"{username}: {message}")
                     
                     database.insert_data('Conversations', 
                                          {'sender': self.users[client].get("username"),
@@ -90,8 +91,10 @@ class Server(User):
                 thread.start()
             except Exception as e:
                 print(f"Error : {e}\n")
-                self.broadcast(f"LEFT {self.users[client].get("username")} left the chat !")
-                self.users.pop(client)
+                username = self.users.get(client, {}).get("username", "UnknownUser")
+                self.broadcast(f"LEFT {username} left the chat !")
+                if client in self.users:
+                    self.users.pop(client)
                 client.close()
                 break
 

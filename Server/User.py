@@ -1,7 +1,7 @@
 import requests
 import json
 import os
-from Scanner import MyScanner
+from .Scanner import MyScanner
 from datetime import datetime
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
@@ -38,8 +38,8 @@ class User:
             self.pair_of_keys = RSA.generate(length)
             self.private_key = self.pair_of_keys.export_key()
             self.public_key = self.pair_of_keys.publickey().export_key()
-            private_key_file = file_path("keys", self.username + "_private_key.pem")
-            public_key_file = file_path("keys", self.username + "_public_key.pem")
+            private_key_file = self.username + "_private_key.pem" # file_path("keys", self.username + "_private_key.pem")
+            public_key_file = self.username + "_public_key.pem" # file_path("keys", self.username + "_public_key.pem")
             with open(private_key_file, "wb") as file:
                 file.write(self.private_key)
             with open(public_key_file, "wb") as file:
@@ -106,10 +106,13 @@ class User:
         # receive a message from a socket
         full_msg = ""
         while True:
-            msg = socket_obj.recv(bytes_to_recv).decode("utf-8")
-            if len(msg) <= 0:
-                break
-            full_msg += msg
+            try:
+                msg = socket_obj.recv(bytes_to_recv).decode("utf-8")
+                if len(msg) <= 0:
+                    break
+                full_msg += msg
+            except Exception as e:
+                print(e)
         return full_msg
 
     def clear_console(self):

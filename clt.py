@@ -12,7 +12,7 @@ import threading
 import os
 import threading
 from Client.client import Client
-from Client.User import file_path
+#from Client.User import file_path
 
 
 HOST = "127.0.0.1"
@@ -21,17 +21,18 @@ LENGTH_OF_BYTES = 2048 # length of the RSA keys in bytes
 
 if __name__ == '__main__':
     try:
-        
-        CLIENT_NAME = input("\nChoose a username :")
-        
+        os.system("clear")
+        print("")
+        CLIENT_NAME = input("Choose a username :")
+
         client = Client(CLIENT_NAME)
 
         client.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.socket.connect((HOST, PORT))
 
         # verify if the client has already generated a pair of keys
-        private_key_file = file_path("keys", client.username + "_private_key.pem")
-        public_key_file = file_path("keys", client.username + "_public_key.pem")
+        private_key_file = client.username + "_private_key.pem" # file_path("keys", client.username + "_private_key.pem")
+        public_key_file = client.username + "_public_key.pem" # file_path("keys", client.username + "_public_key.pem")
         if os.path.exists(private_key_file) and os.path.exists(public_key_file):
             with open(private_key_file, 'rb') as file:
                 client.private_key = file.read()
@@ -40,13 +41,15 @@ if __name__ == '__main__':
         else:
             client.generate_RSA_keys(LENGTH_OF_BYTES)
 
-        receive_thread = threading.Thread(target=client.receive)
+        receive_thread = threading.Thread(target=client.handle_message)
         receive_thread.start()
         
-        write_thread = threading.Thread(target=client.write)
+        write_thread = threading.Thread(target=client.write_message)
         write_thread.start()
         
     except KeyboardInterrupt:
-        print("\Server exited..")
-        if client.socket is not None:
+        print("\nServer exited..")
+        try:
             client.socket.close()
+        except:
+            pass
