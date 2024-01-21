@@ -37,14 +37,13 @@ class DatabaseHandler:
         else:
             print(f"No rows inserted into {table_name} 🚫")
     
-    def insert_user(self, username, public_key, host, public_ip, mac, city, region, loc, timestamp):
+    def insert_user(self, username, public_key, host, public_ip, city, region, loc, timestamp):
         # Create an user
         self.insert_data('Users', {
             'username': username,
             'public_key': public_key,
             'host': host,
             'public_ip': public_ip,
-            'MAC': mac,
             'city': city,
             'region': region,
             'loc': loc,
@@ -110,7 +109,6 @@ DB.create_table('Users', {
     'public_key': 'TEXT',
     'host': 'TEXT',
     'public_ip': 'TEXT',
-    'MAC': 'TEXT',
     'city': 'TEXT',
     'region': 'TEXT',
     'loc': 'TEXT',

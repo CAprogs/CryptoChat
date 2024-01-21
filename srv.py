@@ -8,6 +8,7 @@
 
 
 import os
+import socket
 from Server.server import Server
 #from Server.User import file_path
 from Server.Database import DB
@@ -22,26 +23,22 @@ LENGTH_OF_BYTES = 2048 # length of the RSA keys in bytes
 
 if __name__ == '__main__':
     try:
-        server = Server(SERVER_NAME, HOST, PORT)
-
-        # verify if the server has already generated a pair of keys
-        private_key_file = server.username + "_private_key.pem" # file_path("keys", server.username + "_private_key.pem")
-        public_key_file = server.username + "_public_key.pem" # file_path("keys", server.username + "_public_key.pem")
-        if os.path.exists(private_key_file) and os.path.exists(public_key_file):
-            with open(private_key_file, 'rb') as file:
-                server.private_key = file.read()
-            with open(public_key_file, 'rb') as file:
-                server.public_key = file.read()
-        else:
-            server.generate_RSA_keys(LENGTH_OF_BYTES)
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind((HOST, PORT))
+        s.listen(LIMIT_CLIENTS)
+        os.system("clear")
+        print(f"\nServer listening on {HOST}:{PORT}\n")
+        
+        server = Server(SERVER_NAME, HOST, PORT, s)
 
         # start the server
-        server.start(DB, LIMIT_CLIENTS)
-    
+        server.receive_client()
+
     except KeyboardInterrupt:
         print("\nServer shutdown..")
         try:
             server.socket.close()
-        except:
+        except Exception as e:
+            print("Error when closing the socket : ", e)
             pass
         DB.conn.close()

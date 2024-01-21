@@ -25,31 +25,21 @@ if __name__ == '__main__':
         print("")
         CLIENT_NAME = input("Choose a username :")
 
-        client = Client(CLIENT_NAME)
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((HOST, PORT))
 
-        client.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.socket.connect((HOST, PORT))
-
-        # verify if the client has already generated a pair of keys
-        private_key_file = client.username + "_private_key.pem" # file_path("keys", client.username + "_private_key.pem")
-        public_key_file = client.username + "_public_key.pem" # file_path("keys", client.username + "_public_key.pem")
-        if os.path.exists(private_key_file) and os.path.exists(public_key_file):
-            with open(private_key_file, 'rb') as file:
-                client.private_key = file.read()
-            with open(public_key_file, 'rb') as file:
-                client.public_key = file.read()
-        else:
-            client.generate_RSA_keys(LENGTH_OF_BYTES)
+        client = Client(CLIENT_NAME, HOST, PORT, socket=s)
 
         receive_thread = threading.Thread(target=client.handle_message)
         receive_thread.start()
         
         write_thread = threading.Thread(target=client.write_message)
         write_thread.start()
-        
+
     except KeyboardInterrupt:
         print("\nServer exited..")
         try:
             client.socket.close()
         except:
             pass
+        

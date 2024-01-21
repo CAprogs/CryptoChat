@@ -1,5 +1,5 @@
 import nmap
-import scapy.all as scapy
+#import scapy.all as scapy
 
 class MyScanner:
     def __init__(self, target_ip):
@@ -14,16 +14,16 @@ class MyScanner:
             # Check if the scan was successful
             if "scan" not in self.scan_result:
                 print("Scan failed. Check your scan options and target IP range.")
-                return None
+                return "N/A"
             elif self.target_ip in self.nm.all_hosts():
                 mac_address = self.nm[self.target_ip]['addresses']['mac']
                 return mac_address
             else:
                 print(f"Can't find the MAC address for {self.target_ip}")
-                return None
+                return "N/A"
         except Exception as e:
-            print(f"Error : {e}")
-            return None
+            #print(f"Error : {e}")
+            return "N/A"
 
     '''
     def mac_scan(self):
