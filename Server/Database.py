@@ -39,10 +39,7 @@ class DatabaseHandler:
     
     def insert_user(self, username, public_key, host, public_ip, city, region, loc, timestamp):
         # Insert an user
-        if self.query_data('Users', ['username', 'public_key', 'loc'], f"username='{username}' AND public_key='{public_key}' AND loc='{loc}'") is not None:
-            print(f"User {username} already exists !")
-            return False
-        else:
+        if self.query_data('Users', ['username', 'public_key', 'loc'], f"username='{username}' AND public_key='{public_key}' AND loc='{loc}'") is None:
             self.insert_data('Users', {
                 'username': username,
                 'public_key': public_key,
@@ -54,6 +51,9 @@ class DatabaseHandler:
                 'timestamp': timestamp
             })
             return True
+        else:
+            print(f"User {username} already exists !")
+            return False
 
     def insert_conversation(self, sender, receiver, message, signature, timestamp):
         # Insert a conversation
@@ -111,7 +111,7 @@ class DatabaseHandler:
         if self.cursor.rowcount == 0:
             print(f"No rows found in {table_name} !")
             return None
-        if len(columns) == 1 and columns[0] != '*':
+        elif len(columns) == 1 and columns[0] != '*':
             return self.cursor.fetchone()[0]
         else:
             return self.cursor.fetchall()
