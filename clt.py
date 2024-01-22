@@ -23,7 +23,7 @@ if __name__ == '__main__':
     try:
         os.system("clear")
         print("")
-        CLIENT_NAME = input("Choose a username :")
+        CLIENT_NAME = input("Choose a username ▶︎ ")
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((HOST, PORT))

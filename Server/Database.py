@@ -35,18 +35,33 @@ class DatabaseHandler:
         if self.cursor.rowcount != 0:
             print(f"Inserted {self.cursor.rowcount} rows into {table_name} 📥")
         else:
-            print(f"No rows inserted into {table_name} 🚫")
+            print(f"No rows inserted into {table_name} !")
     
     def insert_user(self, username, public_key, host, public_ip, city, region, loc, timestamp):
-        # Create an user
-        self.insert_data('Users', {
-            'username': username,
-            'public_key': public_key,
-            'host': host,
-            'public_ip': public_ip,
-            'city': city,
-            'region': region,
-            'loc': loc,
+        # Insert an user
+        if self.query_data('Users', ['username', 'public_key', 'loc'], f"username='{username}' AND public_key='{public_key}' AND loc='{loc}'") is not None:
+            print(f"User {username} already exists !")
+            return False
+        else:
+            self.insert_data('Users', {
+                'username': username,
+                'public_key': public_key,
+                'host': host,
+                'public_ip': public_ip,
+                'city': city,
+                'region': region,
+                'loc': loc,
+                'timestamp': timestamp
+            })
+            return True
+
+    def insert_conversation(self, sender, receiver, message, signature, timestamp):
+        # Insert a conversation
+        self.insert_data('Conversations', {
+            'sender': sender,
+            'receiver': receiver,
+            'message': message,
+            'signature': signature,
             'timestamp': timestamp
         })
 
@@ -62,7 +77,7 @@ class DatabaseHandler:
         if self.cursor.rowcount != 0:
             print(f"Deleted {self.cursor.rowcount} rows from {table_name} 🧹")
         else:
-            print(f"No rows deleted from {table_name} 🚫")
+            print(f"No rows deleted from {table_name} !")
 
     def remove_user(self, username):
         # Remove an user
@@ -81,7 +96,7 @@ class DatabaseHandler:
         if self.cursor.rowcount != 0:
             print(f"Updated {self.cursor.rowcount} rows from {table_name} 🔄")
         else:
-            print(f"No rows updated from {table_name} 🚫")
+            print(f"No rows updated from {table_name} !")
 
     def query_data(self, table_name, columns, condition=None):
         # Query data from a table
@@ -94,7 +109,7 @@ class DatabaseHandler:
             query += f' WHERE {condition}'
         self.cursor.execute(query)
         if self.cursor.rowcount == 0:
-            print(f"No rows found in {table_name} 🚫")
+            print(f"No rows found in {table_name} !")
             return None
         if len(columns) == 1 and columns[0] != '*':
             return self.cursor.fetchone()[0]
@@ -119,7 +134,5 @@ DB.create_table('Conversations', {
     'sender': 'TEXT',
     'receiver': 'TEXT',
     'message': 'TEXT',
-    'hash256': 'TEXT',
-    'signature': 'TEXT',
     'timestamp': 'DATETIME'
 })

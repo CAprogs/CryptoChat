@@ -32,7 +32,7 @@ if __name__ == '__main__':
         server = Server(SERVER_NAME, HOST, PORT, s)
 
         # start the server
-        server.receive_client()
+        server.receive_client(DB)
 
     except KeyboardInterrupt:
         print("\nServer shutdown..")
