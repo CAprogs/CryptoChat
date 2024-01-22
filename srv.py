@@ -40,5 +40,4 @@ if __name__ == '__main__':
             server.socket.close()
         except Exception as e:
             print("Error when closing the socket : ", e)
-            pass
         DB.conn.close()

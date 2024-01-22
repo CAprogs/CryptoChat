@@ -130,6 +130,7 @@ class User:
             private_key = file.read()
         with open(public_key_file, "rb") as file:
             public_key = file.read()
+        print("Keys loaded successfully !")
         return private_key, public_key
 
     def geolocate(self):

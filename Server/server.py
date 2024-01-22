@@ -13,26 +13,30 @@ class Server(User):
         self.socket = socket
         self.users = {}
 
-
-    def handle_encrypted_message(self, client, client_public_key:bytes):
+    def handle_encrypted_message(self, socket_obj, src_public_key:bytes, private_key:bytes):
         # handle encrypted messages received from the client
-        encrypted_message = receive_message(client, decode=False)
-        encrypted_signature = receive_message(client, decode=False)
-        signature = decrypt_message(self.private_key, encrypted_signature, blockwise=True)
-        if verify_signature(client_public_key, encrypted_message, signature):
-            decrypted_message = decrypt_message(self.private_key, encrypted_message)
+        encrypted_message = receive_message(socket_obj, decode=False)
+        encrypted_signature = receive_message(socket_obj, decode=False)
+        signature = decrypt_message(private_key, encrypted_signature, blockwise=True)
+        if verify_signature(src_public_key, encrypted_message, signature):
+            decrypted_message = decrypt_message(private_key, encrypted_message)
             return True, decrypted_message, encrypted_message
         else:
             return False, None, encrypted_message
 
+    def send_encrypted_message(self, socket_obj, message:str, dest_public_key:bytes, private_key:bytes):
+        # send encrypted messages to the server
+        encrypted_message = encrypt_message(dest_public_key, bytes(message, 'utf-8'))
+        send_message(encrypted_message, socket_obj)
+        signature = sign_message(private_key, encrypted_message)
+        encrypted_signature = encrypt_message(dest_public_key, signature, blockwise=True)
+        send_message(encrypted_signature, socket_obj)
 
     def broadcast(self, message:str, receivers:list=None, mode="unencrypted"):
         # send a message to clients depending on the message type
         all_clients = list(self.users.keys())
         old_clients = all_clients[:-1]
         if message.startswith("NEW") and receivers is None and mode == "unencrypted":
-            old_clients = all_clients[:-1]
-            message = message.replace("NEW ", "")
             for client in old_clients:
                 send_message(bytes(message, "utf-8"), client)
         elif message.startswith("LEFT") and receivers is None and mode == "unencrypted":
@@ -75,7 +79,7 @@ class Server(User):
             print("Receiving public key from client..")
             client_public_key = receive_message(client, decode=False)
             print("Client public key received !\nHandling encrypted datas from client..")
-            verified, decrypted_user_datas, encrypted_user_datas = self.handle_encrypted_message(client, client_public_key)
+            verified, decrypted_user_datas, encrypted_user_datas = self.handle_encrypted_message(client, client_public_key, self.private_key)
             if verified:
                 print(f"Message from client verified !")
                 print("Datas Decrypted !")
@@ -118,7 +122,7 @@ class Server(User):
                 elif len(self.users) == 1 and i == 1:
                     continue
                 elif len(self.users) == 2:
-                    verified, decrypted_message, encrypted_message = self.handle_encrypted_message(client, sender_public_key)
+                    verified, decrypted_message, encrypted_message = self.handle_encrypted_message(client, sender_public_key, self.private_key)
                     if verified:
                         self.broadcast(f"{sender} ➤ {decrypted_message}", receivers=receivers_list, mode="encrypted")
                         timestamp = get_timestamp()
@@ -130,7 +134,7 @@ class Server(User):
                         print("Signature not verified .. Decryption aborted !")
                 else: # Send message to clients [except sender] if server has more than 2 clients
                     # messages are encrypted by default, unencrypted if specified in broadcast()
-                    verified, decrypted_message, encrypted_message = self.handle_encrypted_message(client, sender_public_key)
+                    verified, decrypted_message, encrypted_message = self.handle_encrypted_message(client, sender_public_key, self.private_key)
                     if verified:
                         self.broadcast(f"{sender} ➤ {decrypted_message}", receivers=receivers_list ,mode="encrypted")
                         timestamp = get_timestamp()
@@ -150,4 +154,4 @@ class Server(User):
                         client.close()
                 except Exception as e:
                     print(f"A second error occured when handling a client : {e}")
-                exit()
+                break
