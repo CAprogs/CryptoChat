@@ -52,16 +52,15 @@ class DatabaseHandler:
             })
             return True
         else:
-            print(f"User {username} already exists !")
+            print(f"User ({username}) already exists !")
             return False
 
-    def insert_conversation(self, sender, receiver, message, signature, timestamp):
+    def insert_conversation(self, sender, receiver, message, timestamp):
         # Insert a conversation
         self.insert_data('Conversations', {
             'sender': sender,
             'receiver': receiver,
             'message': message,
-            'signature': signature,
             'timestamp': timestamp
         })
 

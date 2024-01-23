@@ -38,8 +38,3 @@ if __name__ == '__main__':
 
     except KeyboardInterrupt:
         print("\nServer exited..")
-        try:
-            client.socket.close()
-        except:
-            pass
-        

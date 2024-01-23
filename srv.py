@@ -36,8 +36,5 @@ if __name__ == '__main__':
 
     except KeyboardInterrupt:
         print("\nServer shutdown..")
-        try:
-            server.socket.close()
-        except Exception as e:
-            print("Error when closing the socket : ", e)
+        s.close()
         DB.conn.close()

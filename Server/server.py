@@ -32,46 +32,32 @@ class Server(User):
         encrypted_signature = encrypt_message(dest_public_key, signature, blockwise=True)
         send_message(encrypted_signature, socket_obj)
 
-    def broadcast(self, message:str, receivers:list=None, mode="unencrypted"):
+    def broadcast(self, message:str, receivers:list=None):
         # send a message to clients depending on the message type
         all_clients = list(self.users.keys())
         old_clients = all_clients[:-1]
-        if message.startswith("NEW") and receivers is None and mode == "unencrypted":
+        if message.startswith("NEW") and receivers is None:
+            message = message.replace("NEW ", "")
             for client in old_clients:
-                send_message(bytes(message, "utf-8"), client)
-        elif message.startswith("LEFT") and receivers is None and mode == "unencrypted":
+                self.send_encrypted_message(client, message, self.users[client].get("public_key"), self.private_key)
+        elif message.startswith("LEFT") and receivers is not None:
             message = message.replace("LEFT ", "")
-            for client in all_clients:
-                send_message(bytes(message, "utf-8"), client)
-        elif receivers is not None and mode == "encrypted":
             for client in receivers:
-                encrypted_message = encrypt_message(self.users[client].get("public_key"), bytes(message, 'utf-8'))
-                send_message(encrypted_message, self.socket)
-                signature = sign_message(self.private_key, encrypted_message)
-                encrypted_signature = encrypt_message(self.users[client].get("public_key"), signature, blockwise=True)
-                send_message(encrypted_signature, self.socket)
-        elif receivers is None and mode == "unencrypted":
-            for client in all_clients:
-                send_message(bytes(message, "utf-8"), client)
-        elif receivers is None and mode == "encrypted":
-            for client in all_clients:
-                encrypted_message = encrypt_message(self.users[client].get("public_key"), bytes(message, 'utf-8'))
-                send_message(encrypted_message, self.socket)
-                signature = sign_message(self.private_key, encrypted_message)
-                encrypted_signature = encrypt_message(self.users[client].get("public_key"), signature, blockwise=True)
-                send_message(encrypted_signature, self.socket)
-        elif receivers is not None and mode == "unencrypted":
+                self.send_encrypted_message(client, message, self.users[client].get("public_key"), self.private_key)
+        elif receivers is not None:
             for client in receivers:
-                send_message(bytes(message, "utf-8"), client)
+                self.send_encrypted_message(client, message, self.users[client].get("public_key"), self.private_key)
+        elif receivers is None:
+            for client in all_clients:
+                self.send_encrypted_message(client, message, self.users[client].get("public_key"), self.private_key)
         else:
-            print("This mode isn't supported, try again..")
-
+            print("An error occured when broadcasting the message !")
 
     def receive_client(self, batabase):
         while True:
             client, address = self.socket.accept()
             
-            print(f"Connection from {address} has been established..")
+            print(f"\nConnection from {address} has been established..")
             send_message(bytes("Welcome to CryptoChat server !", "utf-8"), client)
             client_username = receive_message(client)
             print(f"Username of the client is {client_username}\nSending public key to client..")
@@ -95,10 +81,8 @@ class Server(User):
                                     "timestamp": timestamp}
                 if batabase.insert_user(client_username, client_public_key, user_datas[0], user_datas[1], user_datas[2], user_datas[3], user_datas[4], timestamp):
                     print(f"User ({client_username}) added to database !")
-                else:
-                    print(f"User ({client_username}) already in database !")
                 self.broadcast(f"NEW {client_username} joined the chat !")
-                
+
                 thread = threading.Thread(target=self.handle_client, args=(client, batabase))
                 thread.start()
             else:
@@ -110,48 +94,27 @@ class Server(User):
         receivers_dict = self.users.copy()
         receivers_dict.pop(client)
         receivers_list = list(receivers_dict.keys())
+        receivers_username = [self.users[client].get("username") for client in receivers_list]
         sender = self.users[client].get("username")
         sender_public_key = self.users[client].get("public_key")
-        i = 0
         while True:
             try:
-                if len(self.users) == 1 and i == 0:
-                    send_message(bytes("Waiting for a second client ..", "utf-8"), client)
-                    i += 1
-                    continue
-                elif len(self.users) == 1 and i == 1:
-                    continue
-                elif len(self.users) == 2:
-                    verified, decrypted_message, encrypted_message = self.handle_encrypted_message(client, sender_public_key, self.private_key)
-                    if verified:
-                        self.broadcast(f"{sender} ➤ {decrypted_message}", receivers=receivers_list, mode="encrypted")
-                        timestamp = get_timestamp()
-                        database.insert_data('Conversations', {'sender': sender,
-                                                            'receiver': receivers_list[0], 
-                                                            'message': encrypted_message.decode("utf-8"),
-                                                            'timestamp': timestamp})
-                    else:
-                        print("Signature not verified .. Decryption aborted !")
-                else: # Send message to clients [except sender] if server has more than 2 clients
-                    # messages are encrypted by default, unencrypted if specified in broadcast()
-                    verified, decrypted_message, encrypted_message = self.handle_encrypted_message(client, sender_public_key, self.private_key)
-                    if verified:
-                        self.broadcast(f"{sender} ➤ {decrypted_message}", receivers=receivers_list ,mode="encrypted")
-                        timestamp = get_timestamp()
-                        database.insert_data('Conversations', {'sender': sender,
-                                                            'receiver': str(receivers_list), 
-                                                            'message': encrypted_message.decode("utf-8"),  
-                                                            'timestamp': timestamp})
-                    else:
-                        print("Signature not verified .. Decryption aborted !")
+                verified, decrypted_message, encrypted_message = self.handle_encrypted_message(client, sender_public_key, self.private_key)
+                if len(self.users) == 1 and verified:
+                    self.broadcast("Please wait for another client ..", [client])
+                elif len(self.users) == 2 and verified:
+                    self.broadcast(f"{sender} ▻ {decrypted_message.decode("utf-8")}", receivers_list)
+                    timestamp = get_timestamp()
+                    database.insert_conversation(sender, receivers_list[0], encrypted_message.decode("utf-8"), timestamp)
+                elif len(self.users) > 2 and verified: # Send message to all clients [except sender] if server has more than 2 clients
+                    self.broadcast(f"{sender} ➤ {decrypted_message.decode("utf-8")}", receivers_list)
+                    timestamp = get_timestamp()
+                    database.insert_conversation(sender, str(receivers_username), encrypted_message.decode("utf-8"), timestamp)
+                else:
+                    pass
             except Exception as e:
                 print(f"An error occured when handling a client : {e}")
-                try:
-                    if client in self.users:
-                        username = self.users[client].get("username")
-                        self.users.pop(client)
-                        self.broadcast(f"LEFT {username} left the chat !")
-                        client.close()
-                except Exception as e:
-                    print(f"A second error occured when handling a client : {e}")
-                break
+                if len(self.users) == 2:
+                    self.users.pop(client)
+                    self.broadcast(f"LEFT {sender} left the chat !", receivers_list)
+                client.close()

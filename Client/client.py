@@ -13,8 +13,9 @@ class Client(User):
         self.port = port
         self.socket = socket
 
-    def handle_encrypted_message(self, encrypted_message:bytes, socket_obj, src_public_key:bytes, private_key:bytes):
+    def handle_encrypted_message(self, socket_obj, src_public_key:bytes, private_key:bytes):
         # handle encrypted messages received from the client
+        encrypted_message = receive_message(socket_obj, decode=False)
         encrypted_signature = receive_message(socket_obj, decode=False)
         signature = decrypt_message(private_key, encrypted_signature, blockwise=True)
         if verify_signature(src_public_key, encrypted_message, signature):
@@ -36,8 +37,8 @@ class Client(User):
         step = "AUTH"
         while True:
             try:
-                message = receive_message(self.socket)
                 if step == "AUTH":
+                    message = receive_message(self.socket)
                     print(f"\n{message}")
                     send_message(self.username.encode(), self.socket)
                     srv_public_key = receive_message(self.socket, decode=False)
@@ -52,22 +53,16 @@ class Client(User):
                     print("Datas and encrypted signature sent to server !")
                     step = "MAIN"
                 elif step == "MAIN":
-                    if message.startswith("NEW"):
-                        print(f"\n{message.replace("NEW ", "")}\n")
+                    verified, decrypted_message, encrypted_message = self.handle_encrypted_message(self.socket, server_pub_key[0], self.private_key)
+                    if verified:
+                        print(decrypted_message.decode())
                     else:
-                        encrypted_message = bytes(message, "utf-8")
-                        verified, decrypted_message, encrypted_message = self.handle_encrypted_message(encrypted_message, self.socket, server_pub_key[0], self.private_key)
-                        if verified:
-                            print(decrypted_message)
-                        else:
-                            print("Can't verify the message !")
+                        pass
             except Exception as e:
                 print(f"An error occured when handling a message : {e}")
-                if self.socket != "":
-                    print("\nExiting the server..")
-                    self.socket.close()
+                print("\nExiting the server..")
                 break
-
+        
 
     def write_message(self):
         # write a message and send it to the server
@@ -78,6 +73,4 @@ class Client(User):
                 print(f"You ➤ {message}")
             except KeyboardInterrupt:
                 print("\nExiting the server..")
-                if self.socket != "":
-                    self.socket.close()
                 break
