@@ -34,8 +34,8 @@ def receive_message(socket_obj, bytes_to_recv:int=4096, decode:bool=True, encodi
         else:
             return message
     except Exception as e:
-        print(f"Error when receiving message : {e}")
-        return ""
+        #print(f"Error when receiving message : {e}")
+        return None
 
 def generate_RSA_key(username:str, length:int=2048):
     # Generate a pair of RSA keys

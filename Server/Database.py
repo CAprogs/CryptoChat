@@ -50,6 +50,7 @@ class DatabaseHandler:
                 'loc': loc,
                 'timestamp': timestamp
             })
+            print(f"User ({username}) added to database !")
             return True
         else:
             print(f"User ({username}) already exists !")
@@ -116,22 +117,23 @@ class DatabaseHandler:
             return self.cursor.fetchall()
 
 
-DB = DatabaseHandler(DB_NAME)
-DB.create_table('Users', {
-    'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-    'username': 'TEXT',
-    'public_key': 'TEXT',
-    'host': 'TEXT',
-    'public_ip': 'TEXT',
-    'city': 'TEXT',
-    'region': 'TEXT',
-    'loc': 'TEXT',
-    'timestamp': 'DATETIME'
-})
-DB.create_table('Conversations', {
-    'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-    'sender': 'TEXT',
-    'receiver': 'TEXT',
-    'message': 'TEXT',
-    'timestamp': 'DATETIME'
-})
+if __name__ == '__main__':
+    DB = DatabaseHandler(DB_NAME)
+    DB.create_table('Users', {
+        'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
+        'username': 'TEXT',
+        'public_key': 'TEXT',
+        'host': 'TEXT',
+        'public_ip': 'TEXT',
+        'city': 'TEXT',
+        'region': 'TEXT',
+        'loc': 'TEXT',
+        'timestamp': 'DATETIME'
+    })
+    DB.create_table('Conversations', {
+        'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
+        'sender': 'TEXT',
+        'receiver': 'TEXT',
+        'message': 'TEXT',
+        'timestamp': 'DATETIME'
+    })

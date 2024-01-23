@@ -11,7 +11,6 @@ import os
 import socket
 from Server.server import Server
 #from Server.User import file_path
-from Server.Database import DB
 
 
 SERVER_NAME = "Server"
@@ -32,9 +31,8 @@ if __name__ == '__main__':
         server = Server(SERVER_NAME, HOST, PORT, s)
 
         # start the server
-        server.receive_client(DB)
+        server.receive_client()
 
     except KeyboardInterrupt:
         print("\nServer shutdown..")
         s.close()
-        DB.conn.close()
