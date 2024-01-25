@@ -16,6 +16,16 @@ def clear_console():
         # clear the console
         os.system('cls' if os.name == 'nt' else 'clear')
 
+def save_datas(datas, filename, indent=2):
+    if os.path.exists(filename):
+        with open(filename, "r") as file:
+            old_datas = json.load(file)
+            datas += old_datas
+
+    with open(filename, "w") as file:
+        json.dump(datas, file, indent=indent)
+    print(f"\nDatas saved successfully in {filename}")
+
 def get_timestamp():
     # Get the current timestamp
     timestamp = datetime.now().strftime("%d-%m-%Y %H:%M:%S")

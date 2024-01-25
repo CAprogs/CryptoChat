@@ -1,44 +1,33 @@
-import nmap
-#import scapy.all as scapy
+from scapy.all import sniff, IP, TCP
+import json
 
 class MyScanner:
     def __init__(self, target_ip):
-        self.nm = nmap.PortScanner()
         self.target_ip = target_ip
-        self.scan_result = None
+        self.packet_data = []
 
-    def mac_scan(self):
-        try:
-            self.scan_result = self.nm.scan(hosts=self.target_ip, arguments='-sn')
-            
-            # Check if the scan was successful
-            if "scan" not in self.scan_result:
-                print("Scan failed. Check your scan options and target IP range.")
-                return "N/A"
-            elif self.target_ip in self.nm.all_hosts():
-                mac_address = self.nm[self.target_ip]['addresses']['mac']
-                return mac_address
-            else:
-                print(f"Can't find the MAC address for {self.target_ip}")
-                return "N/A"
-        except Exception as e:
-            #print(f"Error : {e}")
-            return "N/A"
+    def packet_handler(self, packet):
+        if IP in packet and TCP in packet and packet[IP].dst == self.target_ip:
+            data = {
+                'source_ip': packet[IP].src,
+                'destination_ip': packet[IP].dst,
+                'protocol': packet[IP].proto,
+                'timestamp': str(packet.time),
+                'source_port': packet[TCP].sport,
+                'destination_port': packet[TCP].dport
+            }
+            self.packet_data.append(data)
 
-    '''
-    def mac_scan(self):
-        try:
-            # Use Scapy to send an ARP request and collect the response
-            arp_request = scapy.ARP(pdst=self.target_ip)
-            broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
-            arp_request_broadcast = broadcast/arp_request
-            answered_list = scapy.srp(arp_request_broadcast, timeout=1, verbose=False)[0]
+    def start_sniffing(self):
+        sniff(prn=self.packet_handler, store=0, filter="tcp")
 
-            # Extract the MAC address from the response
-            mac_address = answered_list[0][1].hwsrc
+    def save_results_to_json(self, filename='scan_results.json'):
+        with open(filename, 'w') as file:
+            json.dump(self.packet_data, file, indent=4)
+        print(f"Scan results saved to {filename}")
 
-            return mac_address
-        except Exception as e:
-            print(f"Error : {e}")
-            return None
-    '''
+# Exemple d'utilisation
+target_ip = '192.168.1.1'
+scanner = MyScanner(target_ip)
+scanner.start_sniffing()
+scanner.save_results_to_json()
