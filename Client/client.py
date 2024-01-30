@@ -1,4 +1,4 @@
-from .User import User 
+from .User import User, ENC_DEC_MODE
 from .User import send_message, receive_message
 from .User import encrypt_message, decrypt_message
 from .User import sign_message, verify_signature
@@ -6,6 +6,7 @@ from .User import sign_message, verify_signature
 
 server_pub_key= ""
 server_username = ""
+
 
 class Client(User):
     def __init__(self, username, host="127.0.0.1", port=1234, socket=""):
@@ -28,7 +29,7 @@ class Client(User):
 
     def send_encrypted_message(self, socket_obj, message:str, dest_public_key:bytes, private_key:bytes):
         # send encrypted messages to the server
-        encrypted_message = encrypt_message(dest_public_key, bytes(message, 'utf-8'))
+        encrypted_message = encrypt_message(dest_public_key, bytes(message, ENC_DEC_MODE))
         send_message(encrypted_message, socket_obj)
         signature = sign_message(private_key, encrypted_message)
         encrypted_signature = encrypt_message(dest_public_key, signature, blockwise=True)
@@ -46,16 +47,17 @@ class Client(User):
                     print(f"\n{message}")
                     send_message(self.username.encode(), self.socket)
                     server_username = receive_message(self.socket)
-                    print("Server username received !")
+                    print("\nAuthentication ..")
+                    #print("Server username received !")
                     server_pub_key = receive_message(self.socket, decode=False)
-                    print("Server public key received !\n")
-                    print("Sending public key to server ...")
+                    #print("Server public key received !\nSending public key to server ...")
                     send_message(self.public_key, self.socket)
-                    print("Public key sent to server !")
+                    #print("Public key sent to server !")
                     my_datas = f"{self.host} {self.public_ip} {self.city} {self.region} {self.location}"
-                    print("Sending encrypted datas with encrypted signature to server ...")
+                    #print("Sending encrypted datas with encrypted signature to server ...")
                     self.send_encrypted_message(self.socket, my_datas, server_pub_key, self.private_key)
-                    print("Datas and encrypted signature sent to server !")
+                    #print("Datas and encrypted signature sent to server !")
+                    print("\nAuthentication completed !\n\n▿ Chat session started, write something .. ▿\n")
                     step = "MAIN"
                 elif step == "MAIN":
                     verified, decrypted_message, encrypted_message = self.handle_encrypted_message(self.socket, server_pub_key, self.private_key)

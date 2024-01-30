@@ -1,44 +1,68 @@
-import nmap
-#import scapy.all as scapy
+from scapy.all import Raw, sniff, get_if_list, IP, TCP
+from datetime import datetime
 
-class MyScanner:
-    def __init__(self, target_ip):
-        self.nm = nmap.PortScanner()
-        self.target_ip = target_ip
-        self.scan_result = None
 
-    def mac_scan(self):
-        try:
-            self.scan_result = self.nm.scan(hosts=self.target_ip, arguments='-sn')
-            
-            # Check if the scan was successful
-            if "scan" not in self.scan_result:
-                print("Scan failed. Check your scan options and target IP range.")
-                return "N/A"
-            elif self.target_ip in self.nm.all_hosts():
-                mac_address = self.nm[self.target_ip]['addresses']['mac']
-                return mac_address
-            else:
-                print(f"Can't find the MAC address for {self.target_ip}")
-                return "N/A"
-        except Exception as e:
-            #print(f"Error : {e}")
-            return "N/A"
+class Sniffer:
+    # This class is used to sniff the network and save the results to a JSON file
+    def __init__(self):
+        self.packet_data = []
 
-    '''
-    def mac_scan(self):
-        try:
-            # Use Scapy to send an ARP request and collect the response
-            arp_request = scapy.ARP(pdst=self.target_ip)
-            broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
-            arp_request_broadcast = broadcast/arp_request
-            answered_list = scapy.srp(arp_request_broadcast, timeout=1, verbose=False)[0]
+    def get_available_interfaces(self):
+        # Print available interfaces
+        available_interfaces = get_if_list()
+        print(f"\nAvailable interfaces : \n{available_interfaces}\n")
 
-            # Extract the MAC address from the response
-            mac_address = answered_list[0][1].hwsrc
+    def print_packet(self, packet):
+    # Only print packets with Raw data
+        if Raw in packet:
+            print(packet.summary())
 
-            return mac_address
-        except Exception as e:
-            print(f"Error : {e}")
-            return None
-    '''
+    def save_packet(self, packet, data, timestamp):
+        # Save packets to a dictionary
+        self.packet_data.append({
+            'source_ip': packet[IP].src,
+            'destination_ip': packet[IP].dst,
+            'data': data,
+            'protocol': packet[IP].proto,
+            'timestamp': timestamp,
+            'source_port': packet[TCP].sport,
+            'destination_port': packet[TCP].dport,
+            })
+
+    def analyze_packet(self, packets):
+        # Analyze packets
+        for packet in packets:
+            if packet.haslayer(IP) and packet.haslayer(TCP):
+                payload = packet[TCP].payload
+                if isinstance(payload, Raw):
+                    timestamp = datetime.fromtimestamp(packet.time).strftime('%Y-%m-%d %H:%M:%S')
+                    try:
+                        data = payload.load.decode('utf-8', errors='ignore')
+                        self.save_packet(packet, data, timestamp)
+                    except UnicodeDecodeError as e:
+                        print("Unicode decoding error:", e)
+                else:
+                    pass
+
+    def start_sniffing(self, count:int=10, interface:str='lo0'): # 'lo0' = localhost
+        # Start sniffing the network (sniffing the last 10 packets by default)
+        if count == "all":
+            sniff(iface=interface, prn=self.analyze_packet)
+        else:
+            sniff(count=count, iface=interface, prn=self.analyze_packet)
+        print(f"\nSession terminated !\n{self.packet_data}") # replace with a saving function
+
+
+'''
+# Uncomment this to test !
+if __name__ == '__main__':
+
+    # Initialize the sniffer
+    sniffer = Sniffer()
+
+    try:
+        print("\nSniffing the network ...\n")
+        sniffer.start_sniffing(count=10)
+    except KeyboardInterrupt:
+        print(f"\nSession terminated !\n{sniffer.packet_data}")
+'''

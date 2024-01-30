@@ -4,20 +4,21 @@
  | (__| |  | |_| | |_) | || (_) | (__| | | | (_| | |_ 
   \___|_|   \__, | .__/ \__\___/ \___|_| |_|\__,_|\__| Client
             |___/|_|                                  
+
+by @CAprogs (https://github.com/CAprogs)
 """
 
 
 import socket
 import threading
-import os
-import threading
 from Client.client import Client
 from Client.User import clear_console
 
 
-HOST = "127.0.0.1"
-PORT = 1234
-LENGTH_OF_BYTES = 2048 # length of the RSA keys in bytes
+HOST = "127.0.0.1"              # Host to connect to
+PORT = 1234                     # Port to connect to
+LENGTH_OF_BYTES = 2048          # Length of the RSA keys in bytes
+
 
 if __name__ == '__main__':
     try:
@@ -34,4 +35,7 @@ if __name__ == '__main__':
         threading.Thread(target=client.write_message).start()
 
     except KeyboardInterrupt:
-        print("\nExiting ..")
+        print("\nExiting the chat ..\nSession closed !")
+    
+    except ConnectionRefusedError:
+        print("\nServer is not running !\nPlease try again later ..\n")

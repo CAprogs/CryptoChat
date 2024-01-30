@@ -8,15 +8,19 @@ from Crypto.Signature import pkcs1_15
 from Crypto.Hash import SHA256
 
 
+ENC_DEC_MODE = "utf-8"
+
+
 def file_path(directory:str="", filename:str=""):
     # Return the path of a file
     return os.path.join(directory, filename)
 
 def clear_console():
-        # clear the console
-        os.system('cls' if os.name == 'nt' else 'clear')
+    # clear the console
+    os.system('cls' if os.name == 'nt' else 'clear')
 
-def save_datas(datas, filename, indent=2):
+def save_datas(datas, filename:str, indent=2):
+    # Save datas in a json file
     if os.path.exists(filename):
         with open(filename, "r") as file:
             old_datas = json.load(file)
@@ -35,7 +39,7 @@ def send_message(message:bytes, socket_obj):
     # Send a message to a socket
     socket_obj.send(message)
 
-def receive_message(socket_obj, bytes_to_recv:int=4096, decode:bool=True, encoding:str='utf-8'):
+def receive_message(socket_obj, bytes_to_recv:int=4096, decode:bool=True, encoding:str=ENC_DEC_MODE):
     # Receive a message from a socket
     try:
         message = socket_obj.recv(bytes_to_recv)
@@ -129,7 +133,6 @@ class User:
         self.username = username
         self.host = host
         self.private_key, self.public_key = generate_RSA_key(username) if not os.path.exists(username + "_private_key.pem") else self.load_keys(username)
-        # get the public ip address, city, region and location
         self.public_ip, self.city, self.region, self.location = self.geolocate()
     
     def load_keys(self, username:str):
