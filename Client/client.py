@@ -4,7 +4,7 @@ from .User import encrypt_message, decrypt_message
 from .User import sign_message, verify_signature
 
 
-server_pub_key= ""
+server_pub_key = ""
 server_username = ""
 
 
@@ -14,7 +14,7 @@ class Client(User):
         self.port = port
         self.socket = socket
 
-    def handle_encrypted_message(self, socket_obj, src_public_key:bytes, private_key:bytes):
+    def handle_encrypted_message(self, socket_obj, src_public_key: bytes, private_key: bytes):
         # handle encrypted messages received from the client
         encrypted_message = receive_message(socket_obj, decode=False)
         if encrypted_message is None:
@@ -27,7 +27,7 @@ class Client(User):
         else:
             return False, None, encrypted_message
 
-    def send_encrypted_message(self, socket_obj, message:str, dest_public_key:bytes, private_key:bytes):
+    def send_encrypted_message(self, socket_obj, message: str, dest_public_key: bytes, private_key: bytes):
         # send encrypted messages to the server
         encrypted_message = encrypt_message(dest_public_key, bytes(message, ENC_DEC_MODE))
         send_message(encrypted_message, socket_obj)
@@ -48,15 +48,15 @@ class Client(User):
                     send_message(self.username.encode(), self.socket)
                     server_username = receive_message(self.socket)
                     print("\nAuthentication ..")
-                    #print("Server username received !")
+                    # print("Server username received !")
                     server_pub_key = receive_message(self.socket, decode=False)
-                    #print("Server public key received !\nSending public key to server ...")
+                    # print("Server public key received !\nSending public key to server ...")
                     send_message(self.public_key, self.socket)
-                    #print("Public key sent to server !")
+                    # print("Public key sent to server !")
                     my_datas = f"{self.host} {self.public_ip} {self.city} {self.region} {self.location}"
-                    #print("Sending encrypted datas with encrypted signature to server ...")
+                    # print("Sending encrypted datas with encrypted signature to server ...")
                     self.send_encrypted_message(self.socket, my_datas, server_pub_key, self.private_key)
-                    #print("Datas and encrypted signature sent to server !")
+                    # print("Datas and encrypted signature sent to server !")
                     print("\nAuthentication completed !\n\n▿ Chat session started, write something .. ▿\n")
                     step = "MAIN"
                 elif step == "MAIN":
@@ -67,7 +67,7 @@ class Client(User):
                         pass
             except Exception as e:
                 print(f"An error occured when handling a message : {e}")
-                print("\nExiting the server..")
+                print("\nPRESS 'CTRL + C' to exit the server..")
                 break
 
     def write_message(self):

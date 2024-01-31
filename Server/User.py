@@ -11,15 +11,17 @@ from Crypto.Hash import SHA256
 ENC_DEC_MODE = "utf-8"
 
 
-def file_path(directory:str="", filename:str=""):
+def file_path(directory: str = "", filename: str = ""):
     # Return the path of a file
     return os.path.join(directory, filename)
+
 
 def clear_console():
     # clear the console
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def save_datas(datas, filename:str, indent=2):
+
+def save_datas(datas, filename: str, indent=2):
     # Save datas in a json file
     if os.path.exists(filename):
         with open(filename, "r") as file:
@@ -30,16 +32,19 @@ def save_datas(datas, filename:str, indent=2):
         json.dump(datas, file, indent=indent)
     print(f"\nDatas saved successfully in {filename}")
 
+
 def get_timestamp():
     # Get the current timestamp
     timestamp = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     return timestamp
 
-def send_message(message:bytes, socket_obj):
+
+def send_message(message: bytes, socket_obj):
     # Send a message to a socket
     socket_obj.send(message)
 
-def receive_message(socket_obj, bytes_to_recv:int=4096, decode:bool=True, encoding:str=ENC_DEC_MODE):
+
+def receive_message(socket_obj, bytes_to_recv: int = 4096, decode: bool = True, encoding: str = ENC_DEC_MODE):
     # Receive a message from a socket
     try:
         message = socket_obj.recv(bytes_to_recv)
@@ -47,11 +52,12 @@ def receive_message(socket_obj, bytes_to_recv:int=4096, decode:bool=True, encodi
             return message.decode(encoding)
         else:
             return message
-    except Exception as e:
-        #print(f"Error when receiving message : {e}")
+    except Exception:
+        # print(f"Error when receiving message : {e}")
         return None
 
-def generate_RSA_key(username:str, length:int=2048):
+
+def generate_RSA_key(username: str, length: int = 2048):
     # Generate a pair of RSA keys
     key = RSA.generate(length)
     private_key = key.export_key()
@@ -65,7 +71,8 @@ def generate_RSA_key(username:str, length:int=2048):
     print("Keys saved successfully !")
     return private_key, public_key
 
-def encrypt_message(public_key:bytes, message:bytes, blockwise:bool=False):
+
+def encrypt_message(public_key: bytes, message: bytes, blockwise: bool = False):
     # Encrypt message with the public key
     try:
         key = RSA.import_key(public_key)
@@ -86,7 +93,8 @@ def encrypt_message(public_key:bytes, message:bytes, blockwise:bool=False):
     except (ValueError, TypeError) as e:
         print(f"Error when encrypting : {e}")
 
-def decrypt_message(private_key:bytes, encrypted_message:bytes, blockwise:bool=False):
+
+def decrypt_message(private_key: bytes, encrypted_message: bytes, blockwise: bool = False):
     # Decrypt message with the private key
     try:
         key = RSA.import_key(private_key)
@@ -105,9 +113,10 @@ def decrypt_message(private_key:bytes, encrypted_message:bytes, blockwise:bool=F
             decrypted_message = b''.join(decrypted_blocks)
         return decrypted_message
     except (ValueError, TypeError) as e:
-            print(f"Error when decrypting : {e}")
+        print(f"Error when decrypting : {e}")
 
-def verify_signature(public_key:bytes, message:bytes, signature:bytes):
+
+def verify_signature(public_key: bytes, message: bytes, signature: bytes):
     # Verify the signature using the public key
     try:
         key = RSA.import_key(public_key)
@@ -117,7 +126,8 @@ def verify_signature(public_key:bytes, message:bytes, signature:bytes):
     except (ValueError, TypeError):
         return False
 
-def sign_message(private_key:bytes, message:bytes):
+
+def sign_message(private_key: bytes, message: bytes):
     # Sign message with the private key
     try:
         key = RSA.import_key(private_key)
@@ -129,13 +139,13 @@ def sign_message(private_key:bytes, message:bytes):
 
 
 class User:
-    def __init__(self, username:str, host:str="127.0.0.1"):
+    def __init__(self, username: str, host: str = "127.0.0.1"):
         self.username = username
         self.host = host
         self.private_key, self.public_key = generate_RSA_key(username) if not os.path.exists(username + "_private_key.pem") else self.load_keys(username)
         self.public_ip, self.city, self.region, self.location = self.geolocate()
-    
-    def load_keys(self, username:str):
+
+    def load_keys(self, username: str):
         # load the keys from the files
         private_key_file = username + "_private_key.pem"
         public_key_file = username + "_public_key.pem"

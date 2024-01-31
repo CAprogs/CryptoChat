@@ -36,7 +36,7 @@ class DatabaseHandler:
             print(f"Inserted {self.cursor.rowcount} rows into {table_name} 📥")
         else:
             print(f"No rows inserted into {table_name} !")
-    
+
     def insert_user(self, username, public_key, host, public_ip, city, region, loc, timestamp):
         # Insert an user
         if self.query_data('Users', ['username', 'public_key', 'loc'], f"username='{username}' AND public_key='{public_key}' AND loc='{loc}'") is None:

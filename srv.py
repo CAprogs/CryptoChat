@@ -1,9 +1,9 @@
-"""                     _             _           _   
-   ___ _ __ _   _ _ __ | |_ ___   ___| |__   __ _| |_ 
+"""                     _             _           _
+   ___ _ __ _   _ _ __ | |_ ___   ___| |__   __ _| |_
   / __| '__| | | | '_ \| __/ _ \ / __| '_ \ / _` | __|
- | (__| |  | |_| | |_) | || (_) | (__| | | | (_| | |_ 
+ | (__| |  | |_| | |_) | || (_) | (__| | | | (_| | |_
   \___|_|   \__, | .__/ \__\___/ \___|_| |_|\__,_|\__| Server
-            |___/|_|                                  
+            |___/|_|
 
 by @CAprogs (https://github.com/CAprogs)
 """
@@ -12,6 +12,7 @@ by @CAprogs (https://github.com/CAprogs)
 import socket
 from Server.server import Server, conversations, users
 from Server.User import clear_console, save_datas
+from Server.Scanner import Sniffer
 
 
 HOST = "127.0.0.1"              # Hosting on localhost
@@ -31,6 +32,9 @@ if __name__ == '__main__':
         print(f"\nHosting the chat on {HOST}:{PORT}\n\nWaiting for connection ...")
 
         server = Server(SERVER_NAME, HOST, PORT, s)
+
+        # sniffer = Sniffer()
+        # sniffer.start_sniffing(count="all")
 
         server.authenticate_client()
 

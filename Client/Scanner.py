@@ -13,7 +13,7 @@ class Sniffer:
         print(f"\nAvailable interfaces : \n{available_interfaces}\n")
 
     def print_packet(self, packet):
-    # Only print packets with Raw data
+        # Only print packets with Raw data
         if Raw in packet:
             print(packet.summary())
 
@@ -44,13 +44,13 @@ class Sniffer:
                 else:
                     pass
 
-    def start_sniffing(self, count:int=10, interface:str='lo0'): # 'lo0' = localhost
+    def start_sniffing(self, count: int = 10, interface: str = 'lo0'):  # 'lo0' = localhost
         # Start sniffing the network (sniffing the last 10 packets by default)
         if count == "all":
             sniff(iface=interface, prn=self.analyze_packet)
         else:
             sniff(count=count, iface=interface, prn=self.analyze_packet)
-        print(f"\nSession terminated !\n{self.packet_data}") # replace with a saving function
+        print(f"\nSession terminated !\n{self.packet_data}")  # replace with a saving function
 
 
 '''

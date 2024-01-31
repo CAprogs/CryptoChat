@@ -3,7 +3,7 @@
   / __| '__| | | | '_ \| __/ _ \ / __| '_ \ / _` | __|
  | (__| |  | |_| | |_) | || (_) | (__| | | | (_| | |_ 
   \___|_|   \__, | .__/ \__\___/ \___|_| |_|\__,_|\__| Client
-            |___/|_|                                  
+            |___/|_|
 
 by @CAprogs (https://github.com/CAprogs)
 """
@@ -36,6 +36,6 @@ if __name__ == '__main__':
 
     except KeyboardInterrupt:
         print("\nExiting the chat ..\nSession closed !")
-    
+
     except ConnectionRefusedError:
         print("\nServer is not running !\nPlease try again later ..\n")
