@@ -10,9 +10,8 @@ by @CAprogs (https://github.com/CAprogs)
 
 
 import socket
-from Server.server import Server, conversations, users
-from Server.User import clear_console, save_datas
-from Server.Scanner import Sniffer
+from Server.server import Server
+from Server.User import clear_console
 
 
 HOST = "127.0.0.1"              # Hosting on localhost
@@ -33,12 +32,7 @@ if __name__ == '__main__':
 
         server = Server(SERVER_NAME, HOST, PORT, s)
 
-        # sniffer = Sniffer()
-        # sniffer.start_sniffing(count="all")
-
         server.authenticate_client()
 
     except KeyboardInterrupt:
-        save_datas(conversations, "conversation.json")
-        save_datas(users, "users.json")
-        print("\nSession terminated !")
+        print("\nSession terminated !\n")

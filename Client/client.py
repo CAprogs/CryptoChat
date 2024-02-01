@@ -60,15 +60,18 @@ class Client(User):
                     print("\nAuthentication completed !\n\n▿ Chat session started, write something .. ▿\n")
                     step = "MAIN"
                 elif step == "MAIN":
-                    verified, decrypted_message, encrypted_message = self.handle_encrypted_message(self.socket, server_pub_key, self.private_key)
+                    verified, decrypted_message, _ = self.handle_encrypted_message(self.socket, server_pub_key, self.private_key)
                     if verified:
                         print(f"{server_username} >>> {decrypted_message.decode()}")
                     else:
-                        pass
-            except Exception as e:
-                print(f"An error occured when handling a message : {e}")
-                print("\nPRESS 'CTRL + C' to exit the server..")
+                        pass # change to raise an error with server closed
+            except BrokenPipeError:
+                print("\nServer is not running, can't send any message ..\nPress Ctrl + C to exit ..\n")
+            except KeyboardInterrupt:
+                print("\nSession closed AAA!\n")
+                # sauvegarder la conversation
                 break
+                
 
     def write_message(self):
         # write a message and send it to the server
@@ -77,6 +80,9 @@ class Client(User):
                 message = input('')
                 self.send_encrypted_message(self.socket, message, server_pub_key, self.private_key)
                 print(f"You ➤ {message}")
+            except BrokenPipeError:
+                print("\nServer is not running, can't send any message ..\nSession closed !\n")
+                # sauvegarder la conversation
             except KeyboardInterrupt:
-                print("\nExiting the server..")
-                break
+                print("\nSession closed BBB!\n")
+                # sauvegarder la conversation

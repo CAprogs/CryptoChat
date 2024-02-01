@@ -48,7 +48,7 @@ class Server(User):
         print(f"\nConnection from {address} has been established..")
         send_message("Welcome to CryptoChat server !".encode(ENC_DEC_MODE), client)
         client_username = receive_message(client)
-        print(f"\n ▶︎ {client_username} joined the Chat ! ◀︎\n")
+        print(f"\n ▶︎ {client_username} ◀︎ joined the Chat !\n")
         # print("\nSending username to client ..")
         send_message(self.username.encode(ENC_DEC_MODE), client)
         time.sleep(0.5)
@@ -57,7 +57,7 @@ class Server(User):
         # print("Receiving client's public key ...")
         client_public_key = receive_message(client, decode=False)
         # print("Client public key received !\nHandling encrypted datas from client..")
-        verified, decrypted_user_datas, encrypted_user_datas = self.handle_encrypted_message(client, client_public_key, self.private_key)
+        verified, decrypted_user_datas, _ = self.handle_encrypted_message(client, client_public_key, self.private_key)
         if verified:
             print("Client authenticated !\n\n▿ Chat session started, write something .. ▿\n")
             user_datas = decrypted_user_datas.decode(ENC_DEC_MODE).split(" ")
@@ -85,13 +85,19 @@ class Server(User):
         global stop_event
 
         while not stop_event.is_set():
-            message = input('')
-            client_username = users[client].get("username")
-            self.send_encrypted_message(client, message, users[client].get("public_key"), self.private_key)
-            print(f"You ➤ {message}")
-            timestamp = get_timestamp()
-            conversations[self.nb] = {self.username, client_username, message, timestamp}
-            self.nb += 1
+            try:
+                message = input('')
+                client_username = users[client].get("username")
+                self.send_encrypted_message(client, message, users[client].get("public_key"), self.private_key)
+                print(f"You ➤ {message}")
+                timestamp = get_timestamp()
+                conversations[self.nb] = {self.username, client_username, message, timestamp}
+                self.nb += 1
+            except BrokenPipeError:
+                print("\nServer is not running, can't send any message ..\nSession closed !\n")
+            except KeyboardInterrupt:
+                print("\nSession closed !\n")
+
 
     def receive_from_client(self, client):
         # Listen to the client and print his messages
@@ -100,14 +106,19 @@ class Server(User):
         global stop_event
 
         client_username = users[client].get("username")
-        while not stop_event.is_set():
-            verified, decrypted_message, encrypted_message = self.handle_encrypted_message(client, users[client].get("public_key"), self.private_key)
-            if verified:
-                print(f"{client_username} >>> {decrypted_message.decode(ENC_DEC_MODE)}")
-                timestamp = get_timestamp()
-                conversations[self.nb] = {client_username, self.username, decrypted_message.decode(ENC_DEC_MODE), timestamp}
-                self.nb += 1
-            else:
-                print(f"\n{client_username} left the chat !\nPress CTRL + C to exit ..")
-                stop_event.set()
-                self.socket.close()
+        try:
+            while not stop_event.is_set():
+                verified, decrypted_message, _ = self.handle_encrypted_message(client, users[client].get("public_key"), self.private_key)
+                if verified:
+                    print(f"{client_username} >>> {decrypted_message.decode(ENC_DEC_MODE)}")
+                    timestamp = get_timestamp()
+                    conversations[self.nb] = {client_username, self.username, decrypted_message.decode(ENC_DEC_MODE), timestamp}
+                    self.nb += 1
+                else:
+                    print(f"\n ▶︎ {client_username} ◀︎ left the chat !\n\nPress Ctrl + C to exit ..\n")
+                    stop_event.set()
+                    self.socket.close()
+        except BrokenPipeError:
+            print("\nServer is not running, can't send any message ..\nSession closed !\n")
+        except KeyboardInterrupt:
+            print("\nSession closed !\n")

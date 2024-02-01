@@ -30,7 +30,7 @@ def save_datas(datas, filename: str, indent=2):
 
     with open(filename, "w") as file:
         json.dump(datas, file, indent=indent)
-    print(f"\nDatas saved successfully in {filename}")
+    print(f"\n\nDatas saved successfully in {filename}")
 
 
 def get_timestamp():

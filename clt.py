@@ -35,7 +35,7 @@ if __name__ == '__main__':
         threading.Thread(target=client.write_message).start()
 
     except KeyboardInterrupt:
-        print("\nExiting the chat ..\nSession closed !")
+        print("\n\nExiting the chat ..\n\nSession closed !")
 
     except ConnectionRefusedError:
-        print("\nServer is not running !\nPlease try again later ..\n")
+        print("\nServer is not running ..\n\nPlease try again later !\n")
