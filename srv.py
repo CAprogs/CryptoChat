@@ -10,13 +10,14 @@ by @CAprogs (https://github.com/CAprogs)
 
 
 import socket
-from Server.server import Server
-from Server.User import clear_console
+from Server.server import Server, conversations, users
+from Server.User import clear_console, ENC_DEC_MODE
+from Server.Database import DatabaseHandler, DB_NAME
 
 
 HOST = "127.0.0.1"              # Hosting on localhost
 PORT = 1234                     # Port to open
-LIMIT_CLIENTS = 1               # Limit the number of clients that can connect to the server
+LIMIT_CLIENTS = 1               # Number of clients that can connect to the server
 LENGTH_OF_BYTES = 2048          # Length of the RSA keys in bytes
 
 
@@ -35,4 +36,32 @@ if __name__ == '__main__':
         server.authenticate_client()
 
     except KeyboardInterrupt:
-        print("\nSession terminated !\n")
+        database = DatabaseHandler(DB_NAME)
+        print("\n\nSaving datas ..\nExiting Session ..")
+        # register conversations
+        for id, conversation in conversations.items():
+            database.insert_conversation(conversation["sender"],
+                                         conversation["receiver"],
+                                         conversation["message"],
+                                         conversation["timestamp"])
+        # register the server as an user
+        database.insert_user(server.username, 
+                             server.public_key.decode(ENC_DEC_MODE), 
+                             server.host,
+                             server.public_ip,
+                             server.city,
+                             server.region, 
+                             server.location, 
+                             server.timestamp)
+        # register all users
+        for id, user in users.items():
+            database.insert_user(user['username'], 
+                                 user['public_key'].decode(ENC_DEC_MODE), 
+                                 user['host'], 
+                                 user['public_ip'],
+                                 user['city'], 
+                                 user['region'], 
+                                 user['location'],
+                                 user['timestamp'])
+        database.conn.close()
+        print("\nSession closed !\n")

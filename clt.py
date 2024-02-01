@@ -18,7 +18,7 @@ from Client.User import clear_console
 HOST = "127.0.0.1"              # Host to connect to
 PORT = 1234                     # Port to connect to
 LENGTH_OF_BYTES = 2048          # Length of the RSA keys in bytes
-
+threads = []
 
 if __name__ == '__main__':
     try:
@@ -31,11 +31,18 @@ if __name__ == '__main__':
 
         client = Client(CLIENT_NAME, HOST, PORT, socket=s)
 
-        threading.Thread(target=client.handle_message).start()
-        threading.Thread(target=client.write_message).start()
+        handling_thread = threading.Thread(target=client.handle_message)
+        writing_thread = threading.Thread(target=client.write_message)
+        threads.append(handling_thread)
+        threads.append(writing_thread)
+        for thread in threads:
+            thread.daemon = True # Kill the threads when the main thread is killed
+            thread.start() # Start the threads
+        for thread in threads: # Wait for the threads to finish
+            thread.join()
 
     except KeyboardInterrupt:
-        print("\n\nExiting the chat ..\n\nSession closed !")
+        print("\n\nSession closed !\n")
 
     except ConnectionRefusedError:
         print("\nServer is not running ..\n\nPlease try again later !\n")

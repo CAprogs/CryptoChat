@@ -3,12 +3,13 @@ import threading
 from .User import User, ENC_DEC_MODE
 from .User import send_message, receive_message, get_timestamp
 from .User import encrypt_message, decrypt_message
-from .User import sign_message, verify_signature, save_datas
+from .User import sign_message, verify_signature
 import time
 
 
 users = {}
 conversations = {}
+threads = []
 stop_event = threading.Event()
 
 
@@ -17,6 +18,7 @@ class Server(User):
         super().__init__(username, host)
         self.port = port
         self.socket = socket
+        self.timestamp = get_timestamp()
         self.nb = 0
 
     def handle_encrypted_message(self, socket_obj, src_public_key: bytes, private_key: bytes):
@@ -70,11 +72,18 @@ class Server(User):
                              "region": user_datas[3],
                              "location": user_datas[4],
                              "timestamp": timestamp}
-
-            threading.Thread(target=self.write_to_client, args=(client,)).start()
-            threading.Thread(target=self.receive_from_client, args=(client,)).start()
+            
+            writing_thread = threading.Thread(target=self.write_to_client, args=(client,))
+            receiving_thread = threading.Thread(target=self.receive_from_client, args=(client,))
+            threads.append(writing_thread)
+            threads.append(receiving_thread)
+            for thread in threads:
+                thread.daemon = True # Kill the threads when the main thread is killed
+                thread.start() # Start the threads
+            for thread in threads: # Wait for the threads to finish
+                thread.join()
         else:
-            print("Client authentication failed !\nShutting down the server ..")
+            print("Client authentication failed !\nShutting down the Session ..")
             self.socket.close()
             return
 
@@ -85,18 +94,13 @@ class Server(User):
         global stop_event
 
         while not stop_event.is_set():
-            try:
-                message = input('')
-                client_username = users[client].get("username")
-                self.send_encrypted_message(client, message, users[client].get("public_key"), self.private_key)
-                print(f"You ➤ {message}")
-                timestamp = get_timestamp()
-                conversations[self.nb] = {self.username, client_username, message, timestamp}
-                self.nb += 1
-            except BrokenPipeError:
-                print("\nServer is not running, can't send any message ..\nSession closed !\n")
-            except KeyboardInterrupt:
-                print("\nSession closed !\n")
+            message = input('')
+            client_username = users[client].get("username")
+            self.send_encrypted_message(client, message, users[client].get("public_key"), self.private_key)
+            print(f"You ➤ {message}")
+            timestamp = get_timestamp()
+            conversations[self.nb] = {"sender": self.username, "receiver": client_username, "message": message, "timestamp": timestamp}
+            self.nb += 1
 
 
     def receive_from_client(self, client):
@@ -106,19 +110,14 @@ class Server(User):
         global stop_event
 
         client_username = users[client].get("username")
-        try:
-            while not stop_event.is_set():
-                verified, decrypted_message, _ = self.handle_encrypted_message(client, users[client].get("public_key"), self.private_key)
-                if verified:
-                    print(f"{client_username} >>> {decrypted_message.decode(ENC_DEC_MODE)}")
-                    timestamp = get_timestamp()
-                    conversations[self.nb] = {client_username, self.username, decrypted_message.decode(ENC_DEC_MODE), timestamp}
-                    self.nb += 1
-                else:
-                    print(f"\n ▶︎ {client_username} ◀︎ left the chat !\n\nPress Ctrl + C to exit ..\n")
-                    stop_event.set()
-                    self.socket.close()
-        except BrokenPipeError:
-            print("\nServer is not running, can't send any message ..\nSession closed !\n")
-        except KeyboardInterrupt:
-            print("\nSession closed !\n")
+        while not stop_event.is_set():
+            verified, decrypted_message, _ = self.handle_encrypted_message(client, users[client].get("public_key"), self.private_key)
+            if verified:
+                print(f"{client_username} >>> {decrypted_message.decode(ENC_DEC_MODE)}")
+                timestamp = get_timestamp()
+                conversations[self.nb] = {"sender": client_username, "receiver": self.username, "message": decrypted_message.decode(ENC_DEC_MODE), "timestamp": timestamp}
+                self.nb += 1
+            else:
+                print(f"\n ▶︎ {client_username} ◀︎ left the chat !\n\nPress Ctrl + C to exit ..\n")
+                stop_event.set()
+                self.socket.close()

@@ -26,7 +26,7 @@ if __name__ == '__main__':
         sniffed_interface = input("Choose an interface [ Press ENTER to use localhost ] ▶︎ ")
 
         if sniffed_interface == "":
-            sniffed_interface = "lo0" if os.name != "nt" else "Localhost"
+            sniffed_interface = "lo0" if os.name != "nt" else "Localhost"     ##### change to the actual Windows interface name
         elif sniffed_interface not in interfaces:
             print(f"\nInterface {sniffed_interface} not found !\n\nSniffer exited.\n")
             exit()

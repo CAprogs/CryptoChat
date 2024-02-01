@@ -41,37 +41,30 @@ class Client(User):
         # handle messages received from the server
         step = "AUTH"
         while True:
-            try:
-                if step == "AUTH":
-                    message = receive_message(self.socket)
-                    print(f"\n{message}")
-                    send_message(self.username.encode(), self.socket)
-                    server_username = receive_message(self.socket)
-                    print("\nAuthentication ..")
-                    # print("Server username received !")
-                    server_pub_key = receive_message(self.socket, decode=False)
-                    # print("Server public key received !\nSending public key to server ...")
-                    send_message(self.public_key, self.socket)
-                    # print("Public key sent to server !")
-                    my_datas = f"{self.host} {self.public_ip} {self.city} {self.region} {self.location}"
-                    # print("Sending encrypted datas with encrypted signature to server ...")
-                    self.send_encrypted_message(self.socket, my_datas, server_pub_key, self.private_key)
-                    # print("Datas and encrypted signature sent to server !")
-                    print("\nAuthentication completed !\n\n▿ Chat session started, write something .. ▿\n")
-                    step = "MAIN"
-                elif step == "MAIN":
-                    verified, decrypted_message, _ = self.handle_encrypted_message(self.socket, server_pub_key, self.private_key)
-                    if verified:
-                        print(f"{server_username} >>> {decrypted_message.decode()}")
-                    else:
-                        pass # change to raise an error with server closed
-            except BrokenPipeError:
-                print("\nServer is not running, can't send any message ..\nPress Ctrl + C to exit ..\n")
-            except KeyboardInterrupt:
-                print("\nSession closed AAA!\n")
-                # sauvegarder la conversation
-                break
-                
+            if step == "AUTH":
+                message = receive_message(self.socket)
+                print(f"\n{message}")
+                send_message(self.username.encode(), self.socket)
+                server_username = receive_message(self.socket)
+                print("\nAuthentication ..")
+                # print("Server username received !")
+                server_pub_key = receive_message(self.socket, decode=False)
+                # print("Server public key received !\nSending public key to server ...")
+                send_message(self.public_key, self.socket)
+                # print("Public key sent to server !")
+                my_datas = f"{self.host} {self.public_ip} {self.city} {self.region} {self.location}"
+                # print("Sending encrypted datas with encrypted signature to server ...")
+                self.send_encrypted_message(self.socket, my_datas, server_pub_key, self.private_key)
+                # print("Datas and encrypted signature sent to server !")
+                print("\nAuthentication completed !\n\n▿ Chat session started, write something .. ▿\n")
+                step = "MAIN"
+            elif step == "MAIN":
+                verified, decrypted_message, _ = self.handle_encrypted_message(self.socket, server_pub_key, self.private_key)
+                if verified:
+                    print(f"{server_username} >>> {decrypted_message.decode()}")
+                else:
+                    pass # change to raise an error with server closed
+
 
     def write_message(self):
         # write a message and send it to the server
@@ -81,8 +74,4 @@ class Client(User):
                 self.send_encrypted_message(self.socket, message, server_pub_key, self.private_key)
                 print(f"You ➤ {message}")
             except BrokenPipeError:
-                print("\nServer is not running, can't send any message ..\nSession closed !\n")
-                # sauvegarder la conversation
-            except KeyboardInterrupt:
-                print("\nSession closed BBB!\n")
-                # sauvegarder la conversation
+                print("\nServer is not running, can't send any message ..\nPress Ctrl + C to exit ..\n")

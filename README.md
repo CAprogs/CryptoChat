@@ -1,16 +1,70 @@
 # CryptoChat 💬🔐
 
-Cryptochat est un projet permettant à deux utilisateurs de communiquer de manière sécurisée via la ligne de commande (CLI). Les messages sont encryptés du chat sont encryptés pour assurer la confidentialité.
+Cryptochat is a project that allows two users to communicate securely via the command line interface (CLI).
 
-- Le serveur est implémenté en Python avec le module socket.
-- Un analyseur de réseau est implémenté pour capturer les paquets envoyés et reçus et s'assurer que les données sont bien chiffrées.
-- Une authentification est nécessaire avant d'accéder au serveur.
-- Les données sont stockées dans une database locale (SQLite).
+- The server is implemented in Python with the socket module.
+- A network sniffer is implemented to capture the packets sent and received and ensure that the data is properly encrypted.
+- An authentication is required before accessing the server.
 
-## Fonctionnalités 🚀
+## About 🥢
 
-- Cryptographie Asymétrique RSA.
-- Stockage des données dans une database locale (SQLite).
-- Interface en ligne de commande (CLI).
+- Cryptochat uses the [RSA](https://en.wikipedia.org/wiki/RSA_(cryptosystem)) algorithm to encrypt messages.
+- All datas are stored into a [SQLite](https://www.sqlite.org/index.html) database.
+- All roles run on the same machine by default.
 
-Retrouvez la liste des bibliothèques utilisées [ici](requirements.txt).
+## Demo 📸
+
+
+## Installation 📦
+
+| Role              | Link          | Description                                                     | Max clients |
+|-------------------|---------------|-----------------------------------------------------------------|-------------|
+| Server (P2P)      | [download]()  | **Host**, **send**, **receive** and **save** messages.          |      1      |
+| Client            | [download]()  | **Send** and **receive** messages.                              |      /      |
+| Sniffer           | [download]()  | **Analyze** a specified  number of TCP packets containing datas.|      /      |
+| All roles         | [download]()  | Contains the **entire project** with all roles.                 |      /      |
+
+## Run the project 🚀
+
+Consider installing python 3.12 or higher.
+
+- Create a virtual environment and install the requirements.
+```
+pip install -r requirements.txt
+```
+
+### Server
+
+```
+python3 srv.py
+```
+
+### Client
+
+```
+python3 clt.py
+```
+
+### Sniffer
+
+```
+python3 sniffer.py
+```
+
+## As simple as that 🤯
+
+The figure below represents how CryptoChat works.
+
+## Author ✍️
+
+- [@CAprogs](https://github.com/CAprogs)
+
+## License 📝
+
+CryptoChat 💬🔐 is under [```MIT License```](LICENSE)
+
+## Donations & Support ❤️
+
+If you **like this project**, feel free to **give it a ⭐**!
+
+<a href="https://www.buymeacoffee.com/CAprogs"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a pizza&emoji=🍕&slug=CAprogs&button_colour=FFDD00&font_colour=000000&font_family=Arial&outline_colour=000000&coffee_colour=ffffff" /></a>
