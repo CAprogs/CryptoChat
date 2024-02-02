@@ -14,6 +14,7 @@ Cryptochat is a project that allows two users to communicate securely via the co
 
 ## Demo 📸
 
+https://github.com/CAprogs/CryptoChat/assets/104645407/b9ee4a11-84b7-4f35-906c-11e2a41257d3
 
 ## Installation 📦
 
