@@ -34,6 +34,13 @@ https://github.com/CAprogs/CryptoChat/assets/104645407/b9ee4a11-84b7-4f35-906c-1
 | Sniffer           | [⇩](https://github.com/CAprogs/CryptoChat/releases/download/v0.0.1/CryptoChat_sniffer.zip) | **Analyze** a specified  number of TCP packets containing datas.|      /      |
 | All roles         | [⇩](https://github.com/CAprogs/CryptoChat/releases/download/v0.0.1/CryptoChat.zip)         | Contains the **entire project** with all roles.                 |      /      |
 
+<details>
+  <summary> About roles 🎭 </summary>
+
+<img width="700" alt="Capture d’écran 2024-02-02 à 21 12 14" src="https://github.com/CAprogs/CryptoChat/assets/104645407/fa4795a7-675e-4258-aade-174ee21027c1">
+
+</details>
+
 ## Run the project 🚀
 
 Consider installing python 3.12 or higher.
@@ -42,6 +49,7 @@ Consider installing python 3.12 or higher.
 ```
 pip install -r requirements.txt
 ```
+
 
 ### Server
 
@@ -63,7 +71,10 @@ python3 snf.py
 
 ## As simple as that 🤯
 
-The figure below represents how CryptoChat works.
+The figures below explain how CryptoChat works.
+
+<img width="1000" alt="About roles" src="https://github.com/CAprogs/CryptoChat/assets/104645407/4eeea55e-3b44-4048-8a26-c1651dc7cdee">
+
 
 ## Author ✍️
 
