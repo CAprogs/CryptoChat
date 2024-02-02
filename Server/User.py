@@ -84,7 +84,7 @@ def encrypt_message(public_key: bytes, message: bytes, blockwise: bool = False):
         else:
             # Divide the message into smaller blocks
             block_size = 190  # based on the key size and padding
-            message_blocks = [message[i:i+block_size] for i in range(0, len(message), block_size)]
+            message_blocks = [message[i: i + block_size] for i in range(0, len(message), block_size)]
             # Encrypt each block separately
             encrypted_blocks = [cipher.encrypt(block) for block in message_blocks]
             # Concatenate the encrypted blocks to form the complete encrypted message
@@ -106,7 +106,7 @@ def decrypt_message(private_key: bytes, encrypted_message: bytes, blockwise: boo
         else:
             # Divide the encrypted message into smaller blocks
             block_size = 256
-            encrypted_blocks = [encrypted_message[i:i+block_size] for i in range(0, len(encrypted_message), block_size)]
+            encrypted_blocks = [encrypted_message[i: i + block_size] for i in range(0, len(encrypted_message), block_size)]
             # Decrypt each block separately
             decrypted_blocks = [cipher.decrypt(block) for block in encrypted_blocks]
             # Concatenate the decrypted blocks to form the complete decrypted message

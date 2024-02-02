@@ -63,7 +63,7 @@ class Client(User):
                 if verified:
                     print(f"{server_username} >>> {decrypted_message.decode()}")
                 else:
-                    pass # change to raise an error with server closed
+                    pass  # change to raise an error with server closed
 
     def write_message(self):
         # write a message and send it to the server
