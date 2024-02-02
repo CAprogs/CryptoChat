@@ -1,5 +1,14 @@
 # CryptoChat 💬🔐
 
+<div align="center">
+
+![GitHub Repo stars](https://img.shields.io/github/stars/CAprogs/CryptoChat?color=yellow) 
+![GitHub](https://img.shields.io/github/license/CAprogs/CryptoChat?color=blue)
+![total downloads](https://img.shields.io/github/downloads/CAprogs/CryptoChat/total?color=purple)
+![latest release](https://img.shields.io/github/v/release/CAprogs/CryptoChat?label=latest&color=darkgreen)
+  
+</div>
+
 Cryptochat is a project that allows two users to communicate securely via the command line interface (CLI).
 
 - The server is implemented in Python with the socket module.
@@ -18,12 +27,12 @@ https://github.com/CAprogs/CryptoChat/assets/104645407/b9ee4a11-84b7-4f35-906c-1
 
 ## Installation 📦
 
-| Role              | Link          | Description                                                     | Max clients |
-|-------------------|---------------|-----------------------------------------------------------------|-------------|
-| Server (P2P)      | [⇩]()         | **Host**, **send**, **receive** and **save** messages.          |      1      |
-| Client            | [⇩]()         | **Send** and **receive** messages.                              |      /      |
-| Sniffer           | [⇩]()         | **Analyze** a specified  number of TCP packets containing datas.|      /      |
-| All roles         | [⇩]()         | Contains the **entire project** with all roles.                 |      /      |
+| Role              | Link                                                                                       | Description                                                     | Max clients |
+|-------------------|--------------------------------------------------------------------------------------------|-----------------------------------------------------------------|-------------|
+| Server (P2P)      | [⇩](https://github.com/CAprogs/CryptoChat/releases/download/v0.0.1/CryptoChat_server.zip)  | **Host**, **send**, **receive** and **save** messages.          |      1      |
+| Client            | [⇩](https://github.com/CAprogs/CryptoChat/releases/download/v0.0.1/CryptoChat_client.zip)  | **Send** and **receive** messages.                              |      /      |
+| Sniffer           | [⇩](https://github.com/CAprogs/CryptoChat/releases/download/v0.0.1/CryptoChat_sniffer.zip) | **Analyze** a specified  number of TCP packets containing datas.|      /      |
+| All roles         | [⇩](https://github.com/CAprogs/CryptoChat/releases/download/v0.0.1/CryptoChat.zip)         | Contains the **entire project** with all roles.                 |      /      |
 
 ## Run the project 🚀
 
