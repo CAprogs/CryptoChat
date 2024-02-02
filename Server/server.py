@@ -72,15 +72,15 @@ class Server(User):
                              "region": user_datas[3],
                              "location": user_datas[4],
                              "timestamp": timestamp}
-            
+
             writing_thread = threading.Thread(target=self.write_to_client, args=(client,))
             receiving_thread = threading.Thread(target=self.receive_from_client, args=(client,))
             threads.append(writing_thread)
             threads.append(receiving_thread)
             for thread in threads:
-                thread.daemon = True # Kill the threads when the main thread is killed
-                thread.start() # Start the threads
-            for thread in threads: # Wait for the threads to finish
+                thread.daemon = True  # Kill the threads when the main thread is killed
+                thread.start()  # Start the threads
+            for thread in threads:  # Wait for the threads to finish
                 thread.join()
         else:
             print("Client authentication failed !\nShutting down the Session ..")
@@ -101,7 +101,6 @@ class Server(User):
             timestamp = get_timestamp()
             conversations[self.nb] = {"sender": self.username, "receiver": client_username, "message": message, "timestamp": timestamp}
             self.nb += 1
-
 
     def receive_from_client(self, client):
         # Listen to the client and print his messages

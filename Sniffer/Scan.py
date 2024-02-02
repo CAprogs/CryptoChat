@@ -14,7 +14,7 @@ class Sniffer:
     def clear_console(self):
         # clear the console
         os.system('cls' if os.name == 'nt' else 'clear')
-    
+
     def save_datas(self, filename: str, datas: dict, indent=2):
         # Save datas in a JSON file
         if os.path.exists(filename):
@@ -23,7 +23,7 @@ class Sniffer:
                 old_datas.update(datas)
                 datas = old_datas
         elif not os.path.exists(filename) and datas == {}:
-            print(f"\nNo datas to save !\n")
+            print("\nNo datas to save !\n")
             return
         with open(filename, "w") as file:
             json.dump(datas, file, indent=indent)
@@ -74,4 +74,4 @@ class Sniffer:
         if count == "all":
             sniff(iface=interface, prn=self.analyze_packet)
         else:
-            sniff(count=count, iface=interface, prn=self.analyze_packet)   
+            sniff(count=count, iface=interface, prn=self.analyze_packet)

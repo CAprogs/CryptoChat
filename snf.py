@@ -19,14 +19,14 @@ if __name__ == '__main__':
 
     try:
         sniffer.clear_console()
-        
-        print(f"\nSniffer's ready ...\n")
+
+        print("\nSniffer's ready ...\n")
         interfaces = sniffer.get_available_interfaces()
 
         sniffed_interface = input("Choose an interface [ Press ENTER to use localhost ] ▶︎ ")
 
         if sniffed_interface == "":
-            sniffed_interface = "lo0" if os.name != "nt" else "Localhost"     ##### change to the actual Windows interface name
+            sniffed_interface = "lo0" if os.name != "nt" else "Localhost"  # change to the actual Windows interface name
         elif sniffed_interface not in interfaces:
             print(f"\nInterface {sniffed_interface} not found !\n\nSniffer exited.\n")
             exit()
@@ -39,12 +39,12 @@ if __name__ == '__main__':
             try:
                 packets_to_sniff = int(packets_to_sniff)
             except ValueError:
-                print(f"\nInvalid number of packets !\n\nSniffer exited !\n")
+                print("\nInvalid number of packets !\n\nSniffer exited !\n")
                 exit()
 
-        sniffer.start_sniffing(count= packets_to_sniff, interface= sniffed_interface)
-        
+        sniffer.start_sniffing(count=packets_to_sniff, interface=sniffed_interface)
+
         sniffer.save_datas("sniffed_datas.json", sniffer.packet_data)
 
     except KeyboardInterrupt:
-        print(f"\n\nSniffer exited.\n")
+        print("\n\nSniffer exited.\n")

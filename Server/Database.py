@@ -72,7 +72,7 @@ class DatabaseHandler:
             'timestamp': timestamp
         })
 
-    def remove_data(self, table_name: str, condition: str= None):
+    def remove_data(self, table_name: str, condition: str = None):
         # Remove data from a table based on a condition or not
         query = f'''
             DELETE FROM {table_name}
@@ -92,7 +92,7 @@ class DatabaseHandler:
         # Remove an user
         self.remove_data('Users', f"username='{username}'")
 
-    def update_data(self, table_name: str, data: str, condition: str=None):
+    def update_data(self, table_name: str, data: str, condition: str = None):
         # Update data in the table based on a condition or not
         query = f'''
             UPDATE {table_name}
@@ -109,7 +109,7 @@ class DatabaseHandler:
             # print(f"No rows updated from {table_name} !")
             return False
 
-    def query_data(self, table_name: str, columns: list, condition: str= None):
+    def query_data(self, table_name: str, columns: list, condition: str = None):
         # Query data from a table
         columns_str = ', '.join(columns)
         query = f'''

@@ -45,22 +45,22 @@ if __name__ == '__main__':
                                          conversation["message"],
                                          conversation["timestamp"])
         # register the server as an user
-        database.insert_user(server.username, 
-                             server.public_key.decode(ENC_DEC_MODE), 
+        database.insert_user(server.username,
+                             server.public_key.decode(ENC_DEC_MODE),
                              server.host,
                              server.public_ip,
                              server.city,
-                             server.region, 
-                             server.location, 
+                             server.region,
+                             server.location,
                              server.timestamp)
         # register all users
         for id, user in users.items():
-            database.insert_user(user['username'], 
-                                 user['public_key'].decode(ENC_DEC_MODE), 
-                                 user['host'], 
+            database.insert_user(user['username'],
+                                 user['public_key'].decode(ENC_DEC_MODE),
+                                 user['host'],
                                  user['public_ip'],
-                                 user['city'], 
-                                 user['region'], 
+                                 user['city'],
+                                 user['region'],
                                  user['location'],
                                  user['timestamp'])
         database.conn.close()

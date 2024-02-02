@@ -1,7 +1,7 @@
-"""                     _             _           _   
-   ___ _ __ _   _ _ __ | |_ ___   ___| |__   __ _| |_ 
+"""                     _             _           _
+   ___ _ __ _   _ _ __ | |_ ___   ___| |__   __ _| |_
   / __| '__| | | | '_ \| __/ _ \ / __| '_ \ / _` | __|
- | (__| |  | |_| | |_) | || (_) | (__| | | | (_| | |_ 
+ | (__| |  | |_| | |_) | || (_) | (__| | | | (_| | |_
   \___|_|   \__, | .__/ \__\___/ \___|_| |_|\__,_|\__| Client
             |___/|_|
 
@@ -36,9 +36,9 @@ if __name__ == '__main__':
         threads.append(handling_thread)
         threads.append(writing_thread)
         for thread in threads:
-            thread.daemon = True # Kill the threads when the main thread is killed
-            thread.start() # Start the threads
-        for thread in threads: # Wait for the threads to finish
+            thread.daemon = True  # Kill the threads when the main thread is killed
+            thread.start()  # Start the threads
+        for thread in threads:  # Wait for the threads to finish
             thread.join()
 
     except KeyboardInterrupt:
