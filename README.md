@@ -19,10 +19,10 @@ Cryptochat is a project that allows two users to communicate securely via the co
 
 | Role              | Link          | Description                                                     | Max clients |
 |-------------------|---------------|-----------------------------------------------------------------|-------------|
-| Server (P2P)      | [download]()  | **Host**, **send**, **receive** and **save** messages.          |      1      |
-| Client            | [download]()  | **Send** and **receive** messages.                              |      /      |
-| Sniffer           | [download]()  | **Analyze** a specified  number of TCP packets containing datas.|      /      |
-| All roles         | [download]()  | Contains the **entire project** with all roles.                 |      /      |
+| Server (P2P)      | [⇩]()         | **Host**, **send**, **receive** and **save** messages.          |      1      |
+| Client            | [⇩]()         | **Send** and **receive** messages.                              |      /      |
+| Sniffer           | [⇩]()         | **Analyze** a specified  number of TCP packets containing datas.|      /      |
+| All roles         | [⇩]()         | Contains the **entire project** with all roles.                 |      /      |
 
 ## Run the project 🚀
 
@@ -48,7 +48,7 @@ python3 clt.py
 ### Sniffer
 
 ```
-python3 sniffer.py
+python3 snf.py
 ```
 
 ## As simple as that 🤯
